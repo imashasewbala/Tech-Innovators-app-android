@@ -67,6 +67,7 @@ npm-debug.log*
 /build/
 dist/
 out/
+sms-verification-backend/
 
 # OS generated files
 .DS_Store
