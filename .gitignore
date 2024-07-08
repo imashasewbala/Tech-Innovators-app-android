@@ -41,3 +41,49 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Dependency directories
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Optional npm cache directory
+.npm/
+
+# Environment variables file
+.env
+
+# IDEs and editors
+.vscode/
+.idea/
+*.iml
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Build output
+/build/
+dist/
+out/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Yarn integrity file
+.yarn-integrity
+
+# Editor-specific files
+*.sublime-project
+*.sublime-workspace
+
+# Mac specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux binaries
+bin/
+
