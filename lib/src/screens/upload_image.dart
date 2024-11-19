@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:gallery_saver/gallery_saver.dart';
 import 'result_screen.dart';
 import 'image_details.dart';
 
@@ -45,25 +44,30 @@ class _UploadImageScreenState extends State<UploadImage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.teal,
-        title: const Text('Upload Image', style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xFFFDF3E7), // Changed to brown
         elevation: 0,
       ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [Colors.teal[300]!, Colors.teal[900]!],
-          ),
-        ),
+        color: const Color(0xFFFDF3E7), // Beige background color
         child: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image.asset('images/cinnamon.png', width: 150, height: 150),
+              // New "Upload Image" title inside the body
+              const Padding(
+                padding: EdgeInsets.only(bottom: 14.0),
+                child: Text(
+                  'Upload Image',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.brown, // Changed to brown for contrast
+                  ),
+                ),
+              ),
+              Image.asset('assets/images/cinnamon6.png', width: 240, height: 240),
               const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text(
@@ -71,7 +75,7 @@ class _UploadImageScreenState extends State<UploadImage> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Colors.brown, // Changed to brown
                   ),
                 ),
               ),
@@ -88,10 +92,10 @@ class _UploadImageScreenState extends State<UploadImage> {
   Widget _buildUploadOption(IconData icon, String text, BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-      color: Colors.white.withOpacity(0.9),
+      color: Colors.brown[50], // Changed to a light brown shade
       child: ListTile(
-        leading: Icon(icon, color: Colors.teal, size: 40),
-        title: Text(text, style: const TextStyle(color: Colors.teal)),
+        leading: Icon(icon, color: Colors.brown, size: 40), // Changed to brown
+        title: Text(text, style: const TextStyle(color: Colors.brown)), // Changed to brown
         onTap: () async {
           if (text == "Capture an image from camera") {
             await _initializeControllerFuture;
@@ -117,6 +121,50 @@ class _UploadImageScreenState extends State<UploadImage> {
     );
   }
 }
+//File validation method
+bool _validateFile(XFile file) {
+  // Allowed file extensions
+  const allowedExtensions = ['jpg', 'jpeg', 'png'];
+  // Maximum file size in bytes (e.g., 15MB)
+  const maxSizeInBytes = 15 * 1024 * 1024;
+
+  // Get file extension
+  final extension = file.path.split('.').last.toLowerCase();
+  // Check file size
+  final fileSize = File(file.path).lengthSync();
+
+  // Validate extension and size
+  if (!allowedExtensions.contains(extension)) {
+  print('Invalid file type: $extension');
+  return false;
+  }
+  if (fileSize > maxSizeInBytes) {
+  print('File size exceeds limit: ${fileSize / (1024 * 1024)} MB');
+  return false;
+  }
+  return true;
+}
+// Show error dialog
+void _showErrorDialog(BuildContext context, String message) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+
 
 class TakePictureScreen extends StatefulWidget {
   final CameraDescription camera;
@@ -150,7 +198,10 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Capture Image')),
+      appBar: AppBar(
+        title: const Text('Capture Image'),
+        backgroundColor: Color(0xFFFDF3E7), // Changed to brown
+      ),
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
@@ -162,6 +213,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Color(0xFFFDF3E7), // Changed to brown
         child: const Icon(Icons.camera_alt),
         onPressed: () async {
           try {
@@ -192,10 +244,23 @@ class DisplayPictureScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.teal,
-          title: const Text('Display the Picture')),
+        backgroundColor: Color(0xFFFDF3E7), // Changed to brown
+        title: const Text(''),
+      ),
       body: Column(
         children: [
+          const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text(
+              'Image Preview',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.brown, // Changed to brown
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
           Expanded(
             child: Image.file(File(imagePath)),
           ),
@@ -204,13 +269,12 @@ class DisplayPictureScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 Future.delayed(Duration(seconds: 2), () {
-                  // Create an instance of ImageDetails with placeholder values
                   ImageDetails details = ImageDetails(
-                      imagePath: imagePath, // Use the imagePath provided to the screen
-                      imageId: '123456', // Placeholder
-                      quality: 'High', // Placeholder
-                      date: '2024-04-24', // Placeholder
-                      time: '12:34 PM' // Placeholder
+                      imagePath: imagePath,
+                      imageId: '123456',
+                      quality: 'High',
+                      date: '2024-04-24',
+                      time: '12:34 PM'
                   );
                   Navigator.pushReplacement(
                     context,
@@ -219,31 +283,13 @@ class DisplayPictureScreen extends StatelessWidget {
                 });
                 showCustomSnackBar(context, imagePath);
               },
-              child: const Text('Upload Image'),
+              child: const Text('Submit'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal,
+                backgroundColor: Colors.brown, // Changed to brown
                 foregroundColor: Colors.white,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () async {
-                // Save the image to the gallery
-                await GallerySaver.saveImage(imagePath);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('Image saved to gallery'),
-                    duration: const Duration(seconds: 2),
-                    backgroundColor: Colors.teal,
-                  ),
-                );
-              },
-              child: const Text('Save the Image'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal,
-                foregroundColor: Colors.white,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero,
+                )
               ),
             ),
           ),
@@ -255,21 +301,21 @@ class DisplayPictureScreen extends StatelessWidget {
   void showCustomSnackBar(BuildContext context, String imagePath) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: Colors.teal,
+        backgroundColor: Color(0xFFFDF3E7), // Changed to brown
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
         content: Container(
-          height: 120, // Adjust the height
+          height: 120,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image.asset('images/cinnamon.png', width: 48, height: 48), // Adjust size as needed
+              CircleAvatar(
+                radius: 24,
+                backgroundImage: AssetImage('assets/images/cinnamon6.png'),
+              ),
               const SizedBox(height: 8),
               const Text(
                 'Upload Successfully!',
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                style: TextStyle(color: Colors.brown, fontSize: 16),
               ),
             ],
           ),
@@ -279,5 +325,8 @@ class DisplayPictureScreen extends StatelessWidget {
     );
   }
 }
+
+
+
 
 

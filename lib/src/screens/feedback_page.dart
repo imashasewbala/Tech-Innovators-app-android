@@ -1,8 +1,9 @@
 import 'package:final_year_project2024/src/screens/login_page.dart';
 import 'package:flutter/material.dart';
-import '../models/feedback.dart'; // Ensure the correct path
-import '../utils/database_helper.dart'; // Ensure the correct path
-import 'package:http/http.dart' as http; // Import http package for making HTTP requests
+import '../models/feedback.dart';
+import '../utils/database_helper.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class FeedbackPage extends StatefulWidget {
   const FeedbackPage({Key? key}) : super(key: key);
@@ -19,97 +20,56 @@ class _FeedbackPageState extends State<FeedbackPage> {
     2: 'Bad',
     3: 'Average',
     4: 'Good',
-    5: 'Very Good',
+    5: 'Excellent',
   };
 
-  // void _submitFeedback(BuildContext context) async {
-  //   if (messageController.text.isNotEmpty && rating > 0) {
-  //     LocalFeedback feedback = LocalFeedback(
-  //       // id: 1, // Replace with actual ID generation logic if needed
-  //       message: messageController.text,
-  //       rating: rating,
-  //     );
-  //
-  //     try {
-  //       DatabaseHelper dbHelper = DatabaseHelper();
-  //       int result = await dbHelper.insertFeedback(feedback);
-  //
-  //       if (result > 0) {
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(
-  //             content: Text('Thank you for your feedback!'),
-  //           ),
-  //         );
-  //
-  //         // Clear form fields after submission
-  //         messageController.clear();
-  //         setState(() {
-  //           rating = 0;
-  //         });
-  //
-  //         // Navigate back to home page after feedback submission
-  //         Navigator.pushReplacementNamed(context, '/home');
-  //       } else {
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(
-  //             content: Text('Failed to submit feedback. Please try again.'),
-  //           ),
-  //         );
-  //       }
-  //     } catch (e) {
-  //       print('Error inserting feedback: $e');
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(
-  //           content: Text('Failed to submit feedback. Please try again.'),
-  //         ),
-  //       );
-  //     }
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text('Please fill in all fields.'),
-  //       ),
-  //     );
-  //   }
-  // }
-
-  // Function to authenticate user using MongoDB API
   Future<void> _submitFeedback(int rating) async {
     String userMail = LoginPage.user_email;
     String msg = messageController.text;
-    String apiUrl = 'https://ap-south-1.aws.data.mongodb-api.com/app/application-0-ltlkiua/endpoint/api/feedback';
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-    };
-    String requestBody = '{"email": "$userMail", "message": "$msg","rating":"$rating"}';
 
     try {
-      var response = await http.post(
-        Uri.parse(apiUrl),
-        headers: headers,
-        body: requestBody,
-      );
 
-      if (response.statusCode == 201) {
-        // Successfully authenticated
-        // You can parse the response data here if needed
-        print('Feddback added: ${response.body}');
-        Navigator.pushReplacementNamed(context, '/dashboard');
-
-      } else {
-        // Handle feeback failure
-        print('beedback failed: ${response.statusCode}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('feedback failed. Please check your fields.'),
-          ),
+        var response = await http.post(
+          Uri.parse("https://lasting-proper-midge.ngrok-free.app/api/feedback/create"),
+          headers: {
+            'Content-Type': 'application/json',
+            "ngrok-skip-browser-warning": "69420",
+          },
+          body: jsonEncode({
+            'email': userMail,
+            'message':msg,
+            'rating': rating,
+          }),
         );
-      }
+
+        if (response.statusCode == 200) {
+
+
+          print('Feedback added successfully');
+          Navigator.pushReplacementNamed(context, '/dashboard');
+
+        } else {
+          print('Unexpected status code: ${response.statusCode}');
+        }
+
+
+
+
+      // DatabaseHelper dbHelper = DatabaseHelper();
+      // LocalFeedback feedback = LocalFeedback(
+      //   email: userMail,
+      //   message: msg,
+      //   rating: rating,
+      // );
+      //
+      // await dbHelper.insertFeedback(feedback);
+
+
     } catch (e) {
-      print('Error authenticating user: $e');
+      print('Error adding feedback: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to authenticate user. Please try again later.'),
+        const SnackBar(
+          content: Text('Failed to submit feedback. Please try again later.'),
         ),
       );
     }
@@ -119,64 +79,140 @@ class _FeedbackPageState extends State<FeedbackPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Provide Feedback'),
-        backgroundColor: Colors.teal[900],
+        title: const Text(
+          'Provide Feedback',
+          style: TextStyle(color: Colors.black),
+        ),
+        centerTitle: true,
+        backgroundColor: Color(0xFFFDF3E7),
+        iconTheme: IconThemeData(color: Colors.black),
       ),
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [Colors.teal[300]!, Colors.teal[900]!],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: messageController,
-                  decoration: InputDecoration(
-                    labelText: 'Feedback',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(),
+        color: Color(0xFFFDF3E7),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0), // Only horizontal padding
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0), // Minimal top padding
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  maxLines: 3,
-                ),
-                SizedBox(height: 20),
-                Text('Rating: $rating - ${ratingDescriptions[rating] ?? 'Select a rating'}'),
-                Slider(
-                  value: rating.toDouble(),
-                  min: 0,
-                  max: 5,
-                  divisions: 5,
-                  onChanged: (value) {
-                    setState(() {
-                      rating = value.toInt();
-                    });
-                  },
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    // Authenticate user before submitting feedback
-                    // _authenticateUser('jane.doe@example.com', 'securepassword1234');
-                    // _submitFeedback(context);
-                    _submitFeedback(rating);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal[900],
-                    foregroundColor: Colors.white,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '1. Were you satisfied with the cinnamon quality classification results?\n'
+                            '2. How can we improve your experience with Cinnalyze?',
+                        style: TextStyle(fontSize: 18, color: Colors.black),
+                      ),
+                      const SizedBox(height: 1), // Reduced spacing
+                      TextField(
+                        controller: messageController,
+                        decoration: InputDecoration(
+                          hintText: 'Your Answers',
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Rating: $rating - ${ratingDescriptions[rating] ?? 'Select a rating'}',
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                          Icon(
+                            Icons.star,
+                            color: Colors.yellow[700],
+                            size: 24,
+                          ),
+                        ],
+                      ),
+                      Slider(
+                        value: rating.toDouble(),
+                        min: 0,
+                        max: 5,
+                        divisions: 5,
+                        onChanged: (value) {
+                          setState(() {
+                            rating = value.toInt();
+                          });
+                        },
+                        activeColor: Colors.yellow[700],
+                        inactiveColor: Colors.grey[300],
+                      ),
+                      const SizedBox(height: 16),
+                      Center(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            _submitFeedback(rating);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(width: 1, color: Colors.brown),
+                            backgroundColor: Colors.brown,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            'Submit Feedback',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  child: Text('Submit Feedback'),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 20), // Space between form and additional text
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  '',
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 10), // Space between the two additional texts
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Align(
+                  alignment: Alignment.centerLeft, // Aligns text to the left
+                  child: Text(
+                    'Contact Us\nContact No: 0765798114\nEmail: ridmirasanjalee63@gmail.com',
+                    style: TextStyle(fontSize: 16, color: Colors.black),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20), // Space between form and additional text
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'Your feedback helps us improve our services and better serve you in the future.',
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
           ),
         ),
       ),

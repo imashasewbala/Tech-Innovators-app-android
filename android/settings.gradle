@@ -8,6 +8,7 @@ pluginManagement {
     }()
 
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
+   
 
     repositories {
         google()
@@ -23,3 +24,4 @@ plugins {
 }
 
 include ":app"
+include ":flutter_plugin_android_lifecycle"

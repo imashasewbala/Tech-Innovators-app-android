@@ -17,7 +17,7 @@ class RecordDetail extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
-        backgroundColor: Colors.teal,
+        backgroundColor: Color(0xFFFDF3E7),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

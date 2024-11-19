@@ -1,113 +1,80 @@
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
-import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../models/user.dart';
 import '../models/feedback.dart'; // Ensure the correct path
 
 class DatabaseHelper {
-  static DatabaseHelper? _databaseHelper;
-  static Database? _database;
+  static final DatabaseHelper _instance = DatabaseHelper._internal();
+  factory DatabaseHelper() => _instance;
+  DatabaseHelper._internal();
 
-  String userTable = 'user_table';
-  String feedbackTable = 'feedback_table';
-  String colId = 'id';
-  String colFirstName = 'firstName';
-  String colLastName = 'lastName';
-  String colEmail = 'email';
-  String colPhoneNumber = 'phoneNumber';
-  String colPassword = 'password';
-  String colIsVerified = 'isVerified';
-  String colMessage = 'message';
-  String colRating = 'rating';
+  final String _baseUrl = 'http://192.168.43.170/api_cinnalyze'; // Replace with your server path
 
-  DatabaseHelper._createInstance();
+  Future<void> _handleRequest(String endpoint, Map<String, dynamic> body) async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl$endpoint'),
+      body: jsonEncode(body),
+      headers: {'Content-Type': 'application/json'},
+    );
 
-  factory DatabaseHelper() {
-    _databaseHelper ??= DatabaseHelper._createInstance();
-    return _databaseHelper!;
-  }
-
-  Future<Database> get database async {
-    _database ??= await initializeDatabase();
-    return _database!;
-  }
-
-  Future<Database> initializeDatabase() async {
-    try {
-      final directory = await getApplicationDocumentsDirectory();
-      final path = join(directory.path, 'user.db');
-      final userDatabase =
-      await openDatabase(path, version: 1, onCreate: _createDb);
-      return userDatabase;
-    } catch (e) {
-      print('Error initializing database: $e');
-      rethrow;
+    final responseBody = jsonDecode(response.body);
+    if (!responseBody['success']) {
+      throw Exception(responseBody['message']);
     }
   }
 
-  void _createDb(Database db, int newVersion) async {
-    await db.execute('''
-      CREATE TABLE $userTable(
-        $colId INTEGER PRIMARY KEY AUTOINCREMENT, 
-        $colFirstName TEXT,
-        $colLastName TEXT,
-        $colEmail TEXT,
-        $colPhoneNumber TEXT,
-        $colPassword TEXT,
-        $colIsVerified INTEGER
-      )
-    ''');
-    await db.execute('''
-      CREATE TABLE $feedbackTable(
-        $colId INTEGER PRIMARY KEY AUTOINCREMENT,
-        $colMessage TEXT,
-        $colRating INTEGER
-      )
-    ''');
-  }
-
-  Future<List<Map<String, dynamic>>> getUserMapList() async {
-    final db = await database;
-    final result =
-    await db.rawQuery('SELECT * FROM $userTable ORDER BY $colFirstName ASC');
-    return result;
-  }
-
-  Future<int> insertUser(User user) async {
+  Future<void> insertUser(User user) async {
     try {
-      final db = await database;
-      final result = await db.insert(userTable, user.toMap());
-      return result;
+      final body = user.toMap(); // Assuming User has a toMap method
+      await _handleRequest('register.php', body);
     } catch (e) {
       print('Error inserting user: $e');
       rethrow;
     }
   }
 
-  Future<int> updateUser(User user) async {
-    final db = await database;
-    final result = await db.update(userTable, user.toMap(),
-        where: '$colId = ?', whereArgs: [user.id]);
-    return result;
+  Future<void> updateUser(User user) async {
+    try {
+      final body = user.toMap(); // Assuming User has a toMap method
+      await _handleRequest('update_user.php', body);
+    } catch (e) {
+      print('Error updating user: $e');
+      rethrow;
+    }
   }
 
   Future<int> getCount() async {
-    final db = await database;
-    final x = await db.rawQuery('SELECT COUNT (*) FROM $userTable');
-    final result = Sqflite.firstIntValue(x);
-    return result!;
+    try {
+      final response = await http.get(Uri.parse('$_baseUrl/user_count.php'));
+      final responseBody = jsonDecode(response.body);
+      if (responseBody['success']) {
+        return responseBody['count'];
+      } else {
+        throw Exception(responseBody['message']);
+      }
+    } catch (e) {
+      print('Error getting user count: $e');
+      rethrow;
+    }
   }
 
   Future<User?> getUser(String email, String password) async {
-    final userMapList = await getUserMapList();
-    for (int i = 0; i < userMapList.length; i++) {
-      if (userMapList[i][colEmail] == email &&
-          userMapList[i][colPassword] == password) {
-        return User.fromMap(userMapList[i]);
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/get_user.php'),
+        body: jsonEncode({'email': email, 'password': password}),
+        headers: {'Content-Type': 'application/json'},
+      );
+      final responseBody = jsonDecode(response.body);
+      if (responseBody['success']) {
+        return User.fromMap(responseBody['user']); // Adjust based on actual response structure
+      } else {
+        throw Exception(responseBody['message']);
       }
+    } catch (e) {
+      print('Error getting user: $e');
+      rethrow;
     }
-    return null;
   }
 
   Future<bool> authenticateUser(String email, String password) async {
@@ -116,21 +83,24 @@ class DatabaseHelper {
   }
 
   Future<bool> resetPassword(String email, String newPassword) async {
-    final db = await database;
-    int count = await db.rawUpdate(
-      'UPDATE $userTable SET $colPassword = ? WHERE $colEmail = ?',
-      [newPassword, email],
-    );
-    return count > 0;
+    try {
+      await _handleRequest('reset_password.php', {'email': email, 'new_password': newPassword});
+      return true;
+    } catch (e) {
+      print('Error resetting password: $e');
+      return false;
+    }
   }
 
-  Future<int> insertFeedback(LocalFeedback feedback) async {
-    final db = await database;
+  Future<void> insertFeedback(LocalFeedback feedback) async {
     try {
-      return await db.insert(feedbackTable, feedback.toMap());
+      final body = feedback.toMap(); // Assuming LocalFeedback has a toMap method
+      await _handleRequest('insert_feedback.php', body);
     } catch (e) {
       print('Error inserting feedback: $e');
-      throw e; // Rethrow the error to handle it in calling code if needed
+      rethrow;
     }
   }
 }
+
+

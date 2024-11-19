@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../services/verification_service.dart';
 import 'login_page.dart'; // Import the LoginPage
+import 'package:http/http.dart' as http;
 
 class CheckVerificationPage extends StatefulWidget {
   final String phone;
+  final String email;
 
-  CheckVerificationPage({required this.phone});
+  CheckVerificationPage({required this.phone, required this.email});
 
   @override
   _CheckVerificationPageState createState() => _CheckVerificationPageState();
@@ -20,13 +24,33 @@ class _CheckVerificationPageState extends State<CheckVerificationPage> {
     if (code.isNotEmpty) {
       final success = await VerificationService.checkVerification(code);
       if (success) {
-        setState(() {
-          _registrationSuccess = true; // Update the state
-        });
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
-        );
+
+
+        try {
+          var response2 = await http.post(
+            Uri.parse("https://lasting-proper-midge.ngrok-free.app/api/users/verified"),
+            headers: {
+              'Content-Type': 'application/json',
+              "ngrok-skip-browser-warning": "69420",
+            },
+            body: jsonEncode({
+              'email': widget.email,
+            }),
+          );
+
+          if (response2.statusCode == 200) {
+            setState(() {
+              _registrationSuccess = true; // Update the state
+            });
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => LoginPage()),
+            );
+          }
+        } catch (e) { }
+
+
+
       } else {
         // Handle error
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Verification failed')));
@@ -49,7 +73,10 @@ class _CheckVerificationPageState extends State<CheckVerificationPage> {
           gradient: LinearGradient(
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
-            colors: [Colors.teal[300]!, Colors.teal[900]!],
+            colors: [
+              Color(0xFFFDF3E7)!, // lighter shade of teal
+              Color(0xFFFDF3E7)!, // darker shade of teal
+            ],
           ),
         ),
         child: SafeArea(
@@ -86,8 +113,8 @@ class _CheckVerificationPageState extends State<CheckVerificationPage> {
                 ElevatedButton(
                   onPressed: _checkVerification,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal[900],
-                    foregroundColor: Colors.white,
+                    backgroundColor: Color(0xFFFDF3E7),
+                    foregroundColor: Colors.black,
                   ),
                   child: const Text('Check Verification'),
                 ),

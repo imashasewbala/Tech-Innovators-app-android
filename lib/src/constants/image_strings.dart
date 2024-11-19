@@ -22,3 +22,7 @@ const String tForgetPasswordImage = "assets/images/forget_password/forget_passwo
 const String tForgetPasswordSubTitle = "Select one of the options given below to reset your password";
 const String tResetViaMail = "Select via E-mail Verification";
 const String tResetViaPhone = "Select via Phone Verification";
+
+
+//--Upload image
+const String tCinnamonLogoImage = "assets/images/cinnamon_logo.png";

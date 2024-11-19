@@ -4,8 +4,8 @@ class User {
   String _lastName;
   String _email;
   String _phoneNumber;
-  String _password; // Make password mutable
-  bool _isVerified = false;
+  String _password;
+  bool _isVerified;
 
   User({
     required String firstName,
@@ -13,12 +13,13 @@ class User {
     required String email,
     required String phoneNumber,
     required String password,
-    required int isVerified,
+    required bool isVerified,
   })  : _firstName = firstName,
         _lastName = lastName,
         _email = email,
         _phoneNumber = phoneNumber,
-        _password = password;
+        _password = password,
+        _isVerified = isVerified;
 
   User.withId({
     required int id,
@@ -27,12 +28,14 @@ class User {
     required String email,
     required String phoneNumber,
     required String password,
+    bool isVerified = false,
   })  : _id = id,
         _firstName = firstName,
         _lastName = lastName,
         _email = email,
         _phoneNumber = phoneNumber,
-        _password = password;
+        _password = password,
+        _isVerified = isVerified;
 
   int? get id => _id;
   String get firstName => _firstName;
@@ -107,7 +110,7 @@ class User {
     map['email'] = _email;
     map['phoneNumber'] = _phoneNumber;
     map['password'] = _password;
-    map['isVerified'] = _isVerified ? 1 : 0;
+    map['isVerified'] = _isVerified ? 1 : 0; // Convert bool to int for database storage
     return map;
   }
 
@@ -120,6 +123,7 @@ class User {
       email: json['email'],
       phoneNumber: json['phoneNumber'],
       password: json['password'],
+      isVerified: json['isVerified'] == 1, // Convert int to bool
     );
   }
 }

@@ -28,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   _navigateToHome() async {
-    await Future.delayed(Duration(seconds: 3), () {}); // Splash screen delay
+    await Future.delayed(Duration(seconds: 4), () {}); // Splash screen delay
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
   }
 
@@ -48,7 +48,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.teal[400]!, Colors.teal[900]!],
+            colors: [
+              Color(0xFFFDF3E7), // Light cream/beige (same as the HomePage background)
+              Color(0xFFFDF3E9), // Dark brown
+            ],
           ),
         ),
         child: Center(
@@ -59,16 +62,20 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 opacity: _animation,
                 child: ScaleTransition(
                   scale: _animation,
-                  child: Image.asset('assets/images/cinnamon_logo.png', width: 200, height: 200),
+                  child: Image.asset(
+                    'assets/images/cinnamon09.png', // Updated to use the new image
+                    width: 200,
+                    height: 200,
+                  ),
                 ),
               ),
               SizedBox(height: 20),
               FadeTransition(
                 opacity: _animation,
                 child: Text(
-                  'Welcome',
+                  'Welcome To Cinnalyze',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.brown,
                     fontSize: 34,
                     fontWeight: FontWeight.bold,
                   ),
@@ -81,5 +88,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
   }
 }
+
+
+
 
 

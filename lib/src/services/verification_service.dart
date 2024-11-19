@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class VerificationService {
-  static const String _startUrl = 'https://verify1-9792-sjb4uz.twil.io/start-verify';
-  static const String _checkUrl = 'https://verify1-9792-sjb4uz.twil.io/check-verify';
+  static const String _startUrl = 'https://verify-3923.twil.io/start_verify';
+  static const String _checkUrl = 'https://verify-3923.twil.io/check_verify';
   static var _formattedPhone = '';
 
   static Future<bool> startVerification(String phone) async {
@@ -19,6 +19,9 @@ class VerificationService {
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
       return body['success'] == true;
+    } else{
+      final body = jsonDecode(response.body);
+      print("ee"+body['error']);
     }
     return false;
   }
@@ -33,7 +36,8 @@ class VerificationService {
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
       return body['success'] ?? false;
-    }
+      }
+
     return false;
   }
 }
@@ -120,7 +124,7 @@ class _VerificationPageState extends State<VerificationPage> {
                           setState(() {
                             isVerifying = true;
                           });
-                          bool success = await VerificationService.checkVerification(codeController.text);
+                          bool success = await VerificationService.checkVerification(phoneController.text);
                           setState(() {
                             isVerifying = false;
                             verificationSuccess = success;

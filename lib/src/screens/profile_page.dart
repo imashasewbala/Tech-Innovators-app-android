@@ -26,8 +26,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.teal,
-        title: const Text('Profile', style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xFFFDF3E7),
+        title: const Text('', style: TextStyle(color: Colors.brown)),
         elevation: 0,
       ),
       body: Container(
@@ -37,16 +37,24 @@ class _ProfilePageState extends State<ProfilePage> {
           gradient: LinearGradient(
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
-            colors: [Colors.teal[300]!, Colors.teal[900]!],
+            colors: [Color(0xFFFDF3E7), Color(0xFFFDF3E7)], // Different colors for gradient
           ),
         ),
         child: SafeArea(
           child: ListView(
             children: <Widget>[
               Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
+                child: Text(
+                  '${LoginPage.user_first_name} ${LoginPage.user_last_name}',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.brown),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircleAvatar(
                       radius: 50,
@@ -55,40 +63,27 @@ class _ProfilePageState extends State<ProfilePage> {
                           : FileImage(_image!) as ImageProvider,
                       backgroundColor: Colors.white,
                     ),
-                    SizedBox(width: 20),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.camera),
-                          icon: Icon(Icons.camera_alt),
-                          label: Text('Capture Image'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.teal,
-                            foregroundColor: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.gallery),
-                          icon: Icon(Icons.photo),
-                          label: Text('Select Image from Gallery'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.teal,
-                            foregroundColor: Colors.white,
-                          ),
-                        ),
-                      ],
+                    SizedBox(height: 20), // Space between CircleAvatar and buttons
+                    ElevatedButton.icon(
+                      onPressed: () => _pickImage(ImageSource.camera),
+                      icon: Icon(Icons.camera_alt),
+                      label: Text(''),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFFDF3E7),
+                        foregroundColor: Colors.brown,
+                      ),
+                    ),
+                    SizedBox(height: 10), // Space between buttons
+                    ElevatedButton.icon(
+                      onPressed: () => _pickImage(ImageSource.gallery),
+                      icon: Icon(Icons.photo),
+                      label: Text(''),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFFDF3E7),
+                        foregroundColor: Colors.brown,
+                      ),
                     ),
                   ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
-                child: Text(
-                  LoginPage.user_first_name + ' '+ LoginPage.user_last_name,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-                  textAlign: TextAlign.center,
                 ),
               ),
               Padding(
@@ -97,19 +92,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     ListTile(
-                      leading: Icon(Icons.email, color: Colors.teal[200]),
-                      title: Text('Email', style: TextStyle(color: Colors.white)),
-                      subtitle: Text(LoginPage.user_email, style: TextStyle(color: Colors.white70)),
+                      leading: Icon(Icons.email, color: Colors.brown),
+                      title: Text('Email', style: TextStyle(color: Colors.brown)),
+                      subtitle: Text(LoginPage.user_email, style: TextStyle(color: Colors.brown)),
                     ),
                     ListTile(
-                      leading: Icon(Icons.phone, color: Colors.teal[200]),
-                      title: Text('Phone', style: TextStyle(color: Colors.white)),
-                      subtitle: Text(LoginPage.user_phone, style: TextStyle(color: Colors.white70)),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.calendar_today, color: Colors.teal[200]),
-                      title: Text('Join Date', style: TextStyle(color: Colors.white)),
-                      subtitle: Text('January 1, 2020', style: TextStyle(color: Colors.white70)),
+                      leading: Icon(Icons.phone, color: Colors.brown),
+                      title: Text('Phone', style: TextStyle(color: Colors.brown)),
+                      subtitle: Text(LoginPage.user_phone, style: TextStyle(color: Colors.brown)),
                     ),
                   ],
                 ),
